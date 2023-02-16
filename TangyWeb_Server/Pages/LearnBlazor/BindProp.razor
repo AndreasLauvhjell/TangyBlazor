@@ -1,21 +1,54 @@
 ﻿@page "/learnblazor/bindprop"
-
-<h3>Product</h3>
-Name: @Product.Name <br />
-Active: @Product.IsActive <br />
-Price: @Product.Price <br />
-This Product is: @(Product.IsActive?"Active":"Inactive") <br /><br />
-
-Active: <input type="checkbox" @bind-value="@Product.IsActive" @bind-value:event="oninput" checked="@(Product.IsActive?"checked":null)"/><br />
-Price: <input type="number" @bind-value="@Product.Price" @bind-value:event="oninput" />
-
+<h2 class="text-success">Individual Product</h2>
+<div class="row">
+    <div class="col-5 border p-3">
+        <h3 class="text-primary">Product Playground</h3> <hr />
+        <div>
+            Set Active: <input type="checkbox" @bind-value="@Product.IsActive" checked="@(Product.IsActive?"checked":null)" /> <br />
+        </div>
+        <div>
+            Set Price: <input type="number" @bind-value="@Product.Price" @bind-value:event="oninput" /> <br />
+        </div>
+        <div>
+            Product Properties:
+            <select @bind="selectedProp">
+                @foreach (var prop in Product.ProductProperties)
+                {
+                    <option value="@prop.Key">@prop.Key</option>
+                }
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="col-5 border p-3">
+        <h3 class="text-primary">Product summary</h3> <hr />
+        Name:   @Product.Name <br />
+        Active: @Product.IsActive <br />
+        Price:  @Product.Price <br />
+        This product is: @(Product.IsActive ? "Active" : "Inactive") <br />
+        Property selected: @selectedProp <br />
+        @if (!String.IsNullOrWhiteSpace(selectedProp))
+        {
+            <p>Property Value: @Product.ProductProperties.FirstOrDefault(u=>u.Key==selectedProp).Value</p>
+        }
+    </div>
+</div>
 
 @code {
-    Tangy_Models.LearnBlazorModels.Demo_Product Product = new()
+    private string selectedProp = "";
+
+    Demo_Product Product = new()
         {
             Id = 1,
             Name = "Rose Candle",
             IsActive = true,
-            Price = 10.99
+            Price = 10.99,
+            ProductProperties = new List<Demo_ProductProp>()
+            {
+                new Demo_ProductProp {Id = 1, Key = "Color", Value="Black"},
+                new Demo_ProductProp {Id = 2, Key = "Flavor", Value="Rose Jasmine"},
+                new Demo_ProductProp {Id = 3, Key = "Size", Value="20oz"}
+
+            }
         };
 }
