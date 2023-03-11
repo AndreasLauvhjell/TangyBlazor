@@ -5,10 +5,13 @@
 <p>Last selected Product: @SelectedName</p>
 <div class="border p-2 mt-2" style="background-color:azure">
     <div class="row">
-    @foreach (Demo_Product prod in Products)
-    {
-            <_IndividualProduct Product="prod" OnFavoriteUpdated="FavoriteCountUpdate" OnSelectedUpdate="LastActiveUpdate" />
-    }
+        @foreach (Demo_Product prod in Products)
+        {
+            <_IndividualProduct Product="prod" OnFavoriteUpdated="FavoriteCountUpdate" OnSelectedUpdate="LastActiveUpdate">
+                <RenderFragment1>#1</RenderFragment1>
+                <RenderFragment2>#2</RenderFragment2>
+            </_IndividualProduct>
+        }
     </div>
 </div>
 
@@ -50,7 +53,7 @@
 
     protected void FavoriteCountUpdate(bool isSelected)
     {
-        if(isSelected)
+        if (isSelected)
         {
             SelectedFavoriteCount++;
         }
