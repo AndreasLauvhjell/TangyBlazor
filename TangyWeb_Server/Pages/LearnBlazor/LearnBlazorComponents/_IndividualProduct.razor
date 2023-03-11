@@ -1,11 +1,22 @@
 ﻿<div class="bg-light border m-2 col-5" @onclick="(args) => SelectedUpdated(args, Product.Name)">
     <h4 class="text-secondary"> Product - @Product.Id </h4>
     <div>
-      <input type="checkbox" @onchange="FavoriteUpdated" />  Add to favorite 
+        <input type="checkbox" @onchange="FavoriteUpdated" />  Add to favorite
     </div>
     <br />
     <div>
         Name: @Product.Name
+    </div>
+    <div>
+        @if(RenderFragment1 != null && RenderFragment2 != null)
+        {
+            <p>Rf from Parent: @RenderFragment1 @RenderFragment2</p>
+        }
+        else
+        {
+            <p>No renderfragments.</p>
+        }
+
     </div>
     <div>
         Show Properties: <input type="checkbox" @bind-value="Product.IsActive" checked="@(Product.IsActive?"checked":null)">
@@ -37,6 +48,11 @@
     [Parameter]
     public EventCallback<string> OnSelectedUpdate { get; set; }
 
+    [Parameter]
+    public RenderFragment RenderFragment1 { get; set; }
+
+    [Parameter]
+    public RenderFragment RenderFragment2 { get; set; }
 
     private async Task FavoriteUpdated(ChangeEventArgs e)
     {
