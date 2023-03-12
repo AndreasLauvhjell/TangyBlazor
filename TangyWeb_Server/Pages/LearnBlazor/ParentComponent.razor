@@ -11,8 +11,18 @@
 
 <_AnotherChildComponent placeholder="Placeholder from parent"></_AnotherChildComponent>
 
+<CascadingValue Value="@messageForGrandChild" Name="message">
+    <CascadingValue Value="@luckyNumber" Name="luckyNumber">
+        <_ChildComponent>
+        </_ChildComponent>
+    </CascadingValue>
+</CascadingValue>
+
+
 
 @code {
+    public string messageForGrandChild = "This is a message from your grandparent (ParentComponent)";
+    public string luckyNumber = "7";
     public string messageText = "";
 
     private void ShowMessage()
