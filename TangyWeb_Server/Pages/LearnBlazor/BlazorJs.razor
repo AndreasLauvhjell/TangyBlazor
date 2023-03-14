@@ -6,14 +6,14 @@
     <button class="btn btn-secondary" style="width:200px;" @onclick="TestConfirmBox">Test Confirm Button</button>
 </div>
 
-<div class="row gap-4 mt-3">
+<div class="row gap-2 mt-3">
     <button class="btn btn-success" style="width:200px;" @onclick="ToastrSuccess">Toastr success</button>
     <button class="btn btn-danger" style="width:200px;" @onclick="ToastrFailure">Toastr failure</button>
 </div>
 
-<div class="row gap-4 mt-5">
-    <button class="btn btn-success" style="width:200px;" @onclick="ToastrSuccess">SweetAlert success</button>
-    <button class="btn btn-danger" style="width:200px;" @onclick="ToastrFailure">SweetAlert failure</button>
+<div class="row gap-2 mt-5">
+    <button class="btn btn-success" style="width:200px;" @onclick="SweetAlertSuccess">SweetAlert success</button>
+    <button class="btn btn-danger" style="width:200px;" @onclick="SweetAlertFailure">SweetAlert failure</button>
 </div>
 
 <div class="row mt-3">
@@ -44,5 +44,16 @@
     private async Task ToastrFailure()
     {
         await _JSRuntime.ToastrError("Operation failed");
+    }
+
+
+    private async Task SweetAlertSuccess()
+    {
+        await _JSRuntime.InvokeVoidAsync("ShowSweetAlert", "success", "Success notification!", "Task completed successfully!");
+    }
+
+    private async Task SweetAlertFailure()
+    {
+        await _JSRuntime.InvokeVoidAsync("ShowSweetAlert", "error", "Failure notification!", "Task was not completed!");
     }
 }

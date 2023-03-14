@@ -1,4 +1,6 @@
-﻿<div>
+﻿@inject IJSRuntime _JSRuntime
+
+<div>
     <div class="alert alert-info">
         @Title
     </div>
@@ -20,7 +22,7 @@
             }
         }
     </div>
-    <button class="btn btn-danger" @onclick="OnButtonClick">Button to be clicked</button>+
+    <button class="btn btn-danger" @onclick="OnButtonClick">Button to be clicked</button>
 
     <_GrandChildComponent></_GrandChildComponent>
 
@@ -37,4 +39,9 @@
 
     [Parameter]
     public EventCallback OnButtonClick { get; set; }
+
+    public async Task ToastrSuccess()
+    {
+        await _JSRuntime.ToastrSuccess("Operation successful");
+    }
 }
