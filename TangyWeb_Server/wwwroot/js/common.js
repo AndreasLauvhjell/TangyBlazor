@@ -24,3 +24,11 @@ window.ShowSweetAlert = (type, title, message) => {
         )
     }
 }
+
+function ShowDeleteConfirmationModal() {
+    $('#deleteConfirmationModal').modal('show');
+}
+
+function HideDeleteConfirmationModal() {
+    $('#deleteConfirmationModal').modal('hide');
+}
