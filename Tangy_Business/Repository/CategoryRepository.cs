@@ -36,7 +36,7 @@ namespace Tangy_Business.Repository
         public int Delete(int id)
         {
             var obj = _db.Categories.FirstOrDefault(u => u.Id == id);
-            if(obj == null)
+            if(obj != null)
             {
                 _db.Categories.Remove(obj);
                 return _db.SaveChanges();
@@ -44,10 +44,10 @@ namespace Tangy_Business.Repository
             return 0;
         }
 
-        public CategoryDTO get(int id)
+        public CategoryDTO Get(int id)
         {
             var obj = _db.Categories.FirstOrDefault(u => u.Id == id);
-            if (obj == null)
+            if (obj != null)
             {
                 return _mapper.Map<Category, CategoryDTO>(obj);
             }
