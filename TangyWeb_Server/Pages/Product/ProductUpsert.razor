@@ -1,16 +1,19 @@
 ﻿@page "/product/create"
 @page "/product/edit/{id:int}"
 
+@using Syncfusion.Blazor.RichTextEditor
 @inject ICategoryRepository _categoryRepository
 @inject IProductRepository _productRepository
 @inject NavigationManager _navigationManager
 @inject IFileUpload _fileUpload
 @inject IJSRuntime _jsRuntime
 
+
 <div class="row my-2">
     <h3 class="card-title text-primary mb-3 ml-3">@Title Product</h3>
 
-    <div class="col-10">
+    <div class="col-md-10">
+
         @if (IsLoading)
         {
             //loading gif
@@ -35,7 +38,7 @@
                 </div>
                 <div class="form-group">
                     <label>Description</label>
-                    <InputTextArea @bind-Value="Product.Description" class="form-control"></InputTextArea>
+                    <SfRichTextEditor @bind-Value="Product.Description"></SfRichTextEditor>
                     <ValidationMessage For="()=>Product.Description"></ValidationMessage>
                 </div>
                 <div class="row pt-3">
@@ -64,7 +67,7 @@
                             <ValidationMessage For="()=>Product.CategoryId"></ValidationMessage>
                         </InputSelect>
                     </div>
-                    <div class="form-group col-6">
+                    <div class="form-group pt-4 col-6">
                         <InputFile OnChange="HandleImageUpload"></InputFile>
                     </div>
                 </div>
@@ -76,16 +79,23 @@
             </EditForm>
         }
     </div>
+    <div class="col-md-2">
+        <img src="@Product.ImageUrl" class="w-100" />
+    </div>
 </div>
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
-    private ProductDTO Product { get; set; } = new();
+    private ProductDTO Product { get; set; } = new()
+        {
+            ImageUrl = "/images/default.png"
+        };
     private IEnumerable<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
     private string Title { get; set; } = "Create";
-    public bool IsLoading { get; set; }
+    public bool IsLoading { get; set; } 
+    public string OldImageUrl { get; set; }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -107,6 +117,7 @@
             //update
             Title = "Update";
             Product = await _productRepository.Get(Id);
+            OldImageUrl = Product.ImageUrl;
         }
 
         IsLoading = false;
@@ -119,11 +130,17 @@
         {
             //Create
             await _productRepository.Create(Product);
+            await _jsRuntime.ToastrSuccess("Product Created Successfully");
         }
         else
         {
             //Update
+            if(OldImageUrl!=Product.ImageUrl)
+            {
+                _fileUpload.DeleteFile(OldImageUrl);
+            }
             await _productRepository.Update(Product);
+            await _jsRuntime.ToastrSuccess("Product Updated Successfully");
         }
         _navigationManager.NavigateTo("product");
     }
@@ -133,12 +150,12 @@
         IsLoading = true;
         try
         {
-            if(e.GetMultipleFiles().Count>0)
+            if (e.GetMultipleFiles().Count > 0)
             {
                 foreach (var file in e.GetMultipleFiles())
                 {
                     System.IO.FileInfo fileinfo = new System.IO.FileInfo(file.Name);
-                    if( fileinfo.Extension.ToLower() == ".jpg" || 
+                    if (fileinfo.Extension.ToLower() == ".jpg" ||
                         fileinfo.Extension.ToLower() == ".png" ||
                         fileinfo.Extension.ToLower() == "jpeg"
                         )
@@ -154,7 +171,7 @@
             }
             IsLoading = false;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await _jsRuntime.ToastrError(ex.Message);
         }
