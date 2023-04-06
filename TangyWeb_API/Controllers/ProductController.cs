@@ -31,7 +31,7 @@ namespace TangyWeb_API.Controllers
                     StatusCode = StatusCodes.Status400BadRequest
                 });
             }
-            var product = _productRepository.Get(productId.Value);
+            var product = await _productRepository.Get(productId.Value);
             if(product == null)
             {
                 return BadRequest(new ErrorModelDTO()
