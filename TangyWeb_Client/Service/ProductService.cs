@@ -12,9 +12,20 @@ namespace TangyWeb_Client.Service
             _httpClient = httpClient;
         }
 
-        public Task<ProductDTO> Get(int productId)
+        public async Task<ProductDTO> Get(int productId)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync($"/api/products/{productId}");
+            var content = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                var product = JsonConvert.DeserializeObject<ProductDTO>(content);
+                return product;
+            }
+            else
+            {
+                var errorModel = JsonConvert.DeserializeObject<ErrorModelDTO>(content);
+                throw new Exception(errorModel.ErrorMessage);
+            }
         }
 
         public async Task<IEnumerable<ProductDTO>> GetAll()
