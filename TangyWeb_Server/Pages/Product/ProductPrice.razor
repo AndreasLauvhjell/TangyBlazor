@@ -14,7 +14,7 @@
 }
 else
 {
-   <div class="row border p-2 mb-4">
+    <div class="row border p-2 mb-4">
         <div class="col-11">
             <div class="card-body">
                 <h4>@Product.Name</h4>
@@ -27,39 +27,51 @@ else
         </div>
     </div>
 
-    <SfGrid @ref="productPriceGrid" DataSource="@ProductPrices" AllowPaging="true" AllowFiltering="true" AllowSorting="true"
-        Toolbar="@(new List<string>{"Add", "Edit", "Update", "Delete", "Cancel"})">
-        <GridEditSettings AllowAdding="true" AllowEditing="true" ShowDeleteConfirmDialog="true" AllowDeleting="true"></GridEditSettings>
-        <GridEvents OnActionBegin="ActionHandler" TValue="ProductPriceDTO"></GridEvents>
-        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
-        <GridSortSettings AllowUnsort="false">
-            <GridSortColumns>
-                <GridSortColumn Field="Price" Direction="SortDirection.Ascending"></GridSortColumn>
-            </GridSortColumns>
-        </GridSortSettings>
-        <GridPageSettings PageSize="5" PageCount="5" PageSizes="true"></GridPageSettings>
-        <GridColumns>
-            <GridColumn IsPrimaryKey="true" AllowAdding="false" Field=@nameof(ProductPriceDTO.Id) HeaderText="ID"></GridColumn>
-            <GridColumn Field=@nameof(ProductPriceDTO.Size) HeaderText="Size">
-                <EditTemplate>
-                    <Syncfusion.Blazor.DropDowns.SfDropDownList DataSource="SizeList" TItem="string" TValue="string"
-                        @bind-Value="((context as ProductPriceDTO).Size)">
-                    </Syncfusion.Blazor.DropDowns.SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ProductPriceDTO.Price) HeaderText="Price" Format="C2"></GridColumn>
-
-            <GridColumn HeaderText="Manage Records" Width="150">
-            <GridCommandColumns>
-                <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-edit", CssClass = "e-flat" })"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-update", CssClass = "e-flat" })"></GridCommandColumn>
-                <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-cancel-icon", CssClass = "e-flat" })"></GridCommandColumn>
-            </GridCommandColumns>
-         </GridColumn>
-
-        </GridColumns>
-    </SfGrid>
+    <button class="btn btn-primary" @onclick="AddProductPrice">Add Product Price</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var price in ProductPrices)
+            {
+                <tr>
+                    <td>@price.Id</td>
+                    <td>@price.Size</td>
+                    <td>@price.Price.ToString("C2")</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => EditProductPrice(price)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteProductPrice(price)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <EditForm Model="EditingPrice" OnValidSubmit="SaveProductPrice">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        @if (IsEditing)
+        {
+            <div>
+                <label>Size:</label>
+                <InputSelect @bind-Value="EditingPrice.Size">
+                    @foreach (var size in SizeList)
+                    {
+                        <option value="@size">@size</option>
+                    }
+                </InputSelect>
+                <label>Price:</label>
+                <InputNumber @bind-Value="EditingPrice.Price" />
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+            </div>
+        }
+    </EditForm>
 }
 
 @code {
@@ -69,13 +81,13 @@ else
     private ProductDTO Product { get; set; } = new();
     private IEnumerable<ProductPriceDTO> ProductPrices { get; set; } = new List<ProductPriceDTO>();
     private bool IsLoading { get; set; } = true;
-    public SfGrid<ProductPriceDTO> productPriceGrid;
-
+    private bool IsEditing { get; set; } = false;
+    private ProductPriceDTO EditingPrice { get; set; } = new();
 
     IEnumerable<String> SizeList = new List<String>()
-    {
-        "Small", "Medium", "Large", "8oz", "16oz", "24oz"
-    };
+        {
+            "Small", "Medium", "Large", "8oz", "16oz", "24oz"
+        };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -92,27 +104,50 @@ else
         }
     }
 
-    public async void ActionHandler(ActionEventArgs<ProductPriceDTO> args)
+    private void AddProductPrice()
     {
-        if(args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
-        {
-            args.Data.ProductId = Id;
-            if(args.Action=="Add")
-            {
-                await _productPriceRepository.Create(args.Data);
-                ProductPrices = await _productPriceRepository.GetAll(Id);
-                productPriceGrid.Refresh();
-            }
-            if(args.Action=="Edit")
-            {
-                await _productPriceRepository.Update(args.Data);
+        EditingPrice = new ProductPriceDTO { ProductId = Id, Size = SizeList.First() };
+        IsEditing = true;
+    }
 
-            }
-        }
-        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+    private void EditProductPrice(ProductPriceDTO price)
+    {
+        EditingPrice = new ProductPriceDTO { Id = price.Id, ProductId = price.ProductId, Size = price.Size, Price = price.Price };
+        IsEditing = true;
+    }
+
+    private async void SaveProductPrice()
+    {
+        if (string.IsNullOrEmpty(EditingPrice.Size))
         {
-            await _productPriceRepository.Delete(args.Data.Id);
-            productPriceGrid.Refresh();
+            // Display an error message or perform other error handling as needed
+            Console.WriteLine("Size cannot be empty.");
+            return;
         }
+
+        if (EditingPrice.Id == 0)
+        {
+            await _productPriceRepository.Create(EditingPrice);
+        }
+        else
+        {
+            await _productPriceRepository.Update(EditingPrice);
+        }
+
+        ProductPrices = await _productPriceRepository.GetAll(Id);
+        IsEditing = false;
+        EditingPrice = new ProductPriceDTO();
+    }
+
+    private async void DeleteProductPrice(ProductPriceDTO price)
+    {
+        await _productPriceRepository.Delete(price.Id);
+        ProductPrices = await _productPriceRepository.GetAll(Id);
+    }
+
+    private void CancelEdit()
+    {
+        IsEditing = false;
+        EditingPrice = new ProductPriceDTO();
     }
 }
