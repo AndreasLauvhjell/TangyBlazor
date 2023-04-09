@@ -11,6 +11,7 @@ else
 {
     <div class="container">
         <div class="row  pb-3 pt-3 backgroundWhite">
+            @Products.Count()
             @foreach (var category in Products.Select(u => u.Category.Name).Distinct())
             {
                 <h2 class="text-success pl-1"><b>@category</b></h2>
@@ -47,6 +48,7 @@ else
             }
         </div>
     </div>
+    
 }
 
 @code
