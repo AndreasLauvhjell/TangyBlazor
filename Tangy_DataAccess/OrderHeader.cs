@@ -32,23 +32,19 @@ namespace Tangy_DataAccess
         public string? SessionId { get; set; }
         public string? PaymentIntentId { get; set; }
 
-
         [Display(Name = "Name")]
         [Required]
         public string Name { get; set; }
-
-        [Display(Name = "Phone Number")]
         [Required]
+        [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
-
+        [Required]
+        [Display(Name = "Street Address")]
         public string StreetAddress { get; set; }
-
         [Required]
         public string State { get; set; }
-
         [Required]
         public string City { get; set; }
-
         [Required]
         [Display(Name = "PostalCode")]
         public string PostalCode { get; set; }
