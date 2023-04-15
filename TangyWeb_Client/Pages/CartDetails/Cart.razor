@@ -121,6 +121,13 @@ else
     {
         OrderTotal = 0;
         ShoppingCart = await _localStorage.GetItemAsync<List<ShoppingCart>>(SD.ShoppingCart);
+
+        // Initialize ShoppingCart if it's null. NB: La til dette ekstra. Foreløpig håndteres ikke nullpointer i guiden!
+        if (ShoppingCart == null)
+        {
+            ShoppingCart = new List<ShoppingCart>();
+        }
+
         foreach (var cart in ShoppingCart)
         {
             cart.Product = Products.FirstOrDefault(u => u.Id == cart.ProductId);
