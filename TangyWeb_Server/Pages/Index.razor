@@ -11,7 +11,13 @@
     <a href="/LearnBlazor/LearnRouting/">Learn Routing</a>
     <a href="/LearnBlazor/BlazorJs/">BlazorJs</a>
     <a href="/LearnBlazor/Lifecycle">Lifecycle</a>
-    <a href="/category">Category</a>
-    <a href="/product">Product</a>
+    <AuthorizeView Roles="@roleAdmin">
+        <a href="/category">Category</a>
+        <a href="/product">Product</a>
+    </AuthorizeView>
 </div>
 
+@code
+{
+    private string roleAdmin = Tangy_Common.SD.Role_Admin;
+}
